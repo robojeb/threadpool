@@ -17,6 +17,7 @@ use std::mem;
 use std::sync::mpsc::{channel, Sender, Receiver};
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::marker::Sync;
 #[cfg(feature = "scoped-pool")]
 use std::thread::JoinGuard;
 
@@ -117,6 +118,8 @@ impl ThreadPool {
         self.jobs.send(Box::new(move || job())).unwrap();
     }
 }
+
+unsafe impl Sync for ThreadPool {}
 
 fn spawn_in_pool(jobs: Arc<Mutex<Receiver<Thunk<'static>>>>) {
     thread::spawn(move || {
